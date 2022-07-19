@@ -150,8 +150,7 @@ public class c1_Introduction extends IntroductionBase {
         CopyOnWriteArrayList<String> companyList = new CopyOnWriteArrayList<>();
 
         fortuneTop5()
-                .map(companyList::add)
-                .subscribe(aBoolean -> serviceCallCompleted.set(aBoolean));
+                .subscribe(companyList::add, e -> {}, () -> serviceCallCompleted.set(true));
 
         Thread.sleep(1000);
 
