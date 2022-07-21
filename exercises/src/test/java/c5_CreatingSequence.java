@@ -283,13 +283,15 @@ public class c5_CreatingSequence {
         //------------------------------------------------------
         AtomicInteger counter3 = new AtomicInteger();
         Flux<Integer> pushFlux = Flux.push(sink -> {
-            int i = counter3.incrementAndGet();
+            new Thread(() -> {
+                int i = counter3.incrementAndGet();
+                if (i <= 5) {
+                    sink.next(i);
+                } else {
+                    sink.complete();
+                }
+            }).start();
 
-            if (i <= 5) {
-                sink.next(i);
-            } else {
-                sink.complete();
-            }
         });
 
         StepVerifier.create(generateFlux.log())
