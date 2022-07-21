@@ -269,42 +269,32 @@ public class c5_CreatingSequence {
         });
 
         //------------------------------------------------------
-        AtomicInteger counter2 = new AtomicInteger();
         Flux<Integer> createFlux = Flux.create(sink -> {
-            int i = counter2.incrementAndGet();
-
-            if (i <= 5) {
+            for (int i = 1; i <= 5; i++) {
                 sink.next(i);
-            } else {
-                sink.complete();
             }
+            sink.complete();
         });
 
         //------------------------------------------------------
-        AtomicInteger counter3 = new AtomicInteger();
         Flux<Integer> pushFlux = Flux.push(sink -> {
-            new Thread(() -> {
-                int i = counter3.incrementAndGet();
-                if (i <= 5) {
-                    sink.next(i);
-                } else {
-                    sink.complete();
-                }
-            }).start();
-
+            for (int i = 1; i <= 5; i++) {
+                sink.next(i);
+            }
+            sink.complete();
         });
 
         StepVerifier.create(generateFlux.log())
                     .expectNext(1, 2, 3, 4, 5)
                     .verifyComplete();
-//
-//        StepVerifier.create(createFlux.log())
-//                    .expectNext(1, 2, 3, 4, 5)
-//                    .verifyComplete();
 
-//        StepVerifier.create(pushFlux)
-//                    .expectNext(1, 2, 3, 4, 5)
-//                    .verifyComplete();
+        StepVerifier.create(createFlux.log())
+                    .expectNext(1, 2, 3, 4, 5)
+                    .verifyComplete();
+
+        StepVerifier.create(pushFlux)
+                    .expectNext(1, 2, 3, 4, 5)
+                    .verifyComplete();
     }
 
     /**
@@ -312,8 +302,7 @@ public class c5_CreatingSequence {
      */
     @Test
     public void multi_threaded_producer() {
-        //todo: find a bug and fix it!
-        Flux<Integer> producer = Flux.push(sink -> {
+        Flux<Integer> producer = Flux.create(sink -> {
             for (int i = 0; i < 100; i++) {
                 int finalI = i;
                 new Thread(() -> sink.next(finalI)).start(); //don't change this line!
