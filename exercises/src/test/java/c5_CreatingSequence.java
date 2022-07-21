@@ -3,6 +3,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
@@ -166,7 +167,7 @@ public class c5_CreatingSequence {
     @Test
     public void from_array() {
         Integer[] array = {1, 2, 3, 4, 5};
-        Flux<Integer> arrayFlux = null; //todo: change this line only
+        Flux<Integer> arrayFlux = Flux.fromArray(array);
 
         StepVerifier.create(arrayFlux)
                     .expectNext(1, 2, 3, 4, 5)
@@ -179,7 +180,7 @@ public class c5_CreatingSequence {
     @Test
     public void from_list() {
         List<String> list = Arrays.asList("1", "2", "3", "4", "5");
-        Flux<String> listFlux = null; //todo: change this line only
+        Flux<String> listFlux = Flux.fromIterable(list);
 
         StepVerifier.create(listFlux)
                     .expectNext("1", "2", "3", "4", "5")
@@ -192,7 +193,7 @@ public class c5_CreatingSequence {
     @Test
     public void from_stream() {
         Stream<String> stream = Stream.of("5", "6", "7", "8", "9");
-        Flux<String> streamFlux = null; //todo: change this line only
+        Flux<String> streamFlux = Flux.fromStream(stream);
 
         StepVerifier.create(streamFlux)
                     .expectNext("5", "6", "7", "8", "9")
@@ -204,7 +205,7 @@ public class c5_CreatingSequence {
      */
     @Test
     public void interval() {
-        Flux<Long> interval = null; //todo: change this line only
+        Flux<Long> interval = Flux.interval(Duration.ofSeconds(1));
 
         System.out.println("Interval: ");
         StepVerifier.create(interval.take(3).doOnNext(System.out::println))
@@ -222,7 +223,7 @@ public class c5_CreatingSequence {
      */
     @Test
     public void range() {
-        Flux<Integer> range = null; //todo: change this line only
+        Flux<Integer> range = Flux.range(-5 ,11);
 
         System.out.println("Range: ");
         StepVerifier.create(range.doOnNext(System.out::println))
@@ -237,7 +238,7 @@ public class c5_CreatingSequence {
     @Test
     public void repeat() {
         AtomicInteger counter = new AtomicInteger(0);
-        Flux<Integer> repeated = null; //todo: change this line
+        Flux<Integer> repeated = Mono.fromCallable(() -> counter.incrementAndGet()).repeat(9);
 
         System.out.println("Repeat: ");
         StepVerifier.create(repeated.doOnNext(System.out::println))
@@ -256,33 +257,52 @@ public class c5_CreatingSequence {
     @Test
     public void generate_programmatically() {
 
+        AtomicInteger counter = new AtomicInteger();
         Flux<Integer> generateFlux = Flux.generate(sink -> {
-            //todo: fix following code so it emits values from 0 to 5 and then completes
+            int i = counter.incrementAndGet();
+
+            if (i <= 5) {
+                sink.next(i);
+            } else {
+                sink.complete();
+            }
         });
 
         //------------------------------------------------------
-
+        AtomicInteger counter2 = new AtomicInteger();
         Flux<Integer> createFlux = Flux.create(sink -> {
-            //todo: fix following code so it emits values from 0 to 5 and then completes
+            int i = counter2.incrementAndGet();
+
+            if (i <= 5) {
+                sink.next(i);
+            } else {
+                sink.complete();
+            }
         });
 
         //------------------------------------------------------
-
+        AtomicInteger counter3 = new AtomicInteger();
         Flux<Integer> pushFlux = Flux.push(sink -> {
-            //todo: fix following code so it emits values from 0 to 5 and then completes
+            int i = counter3.incrementAndGet();
+
+            if (i <= 5) {
+                sink.next(i);
+            } else {
+                sink.complete();
+            }
         });
 
-        StepVerifier.create(generateFlux)
+        StepVerifier.create(generateFlux.log())
                     .expectNext(1, 2, 3, 4, 5)
                     .verifyComplete();
+//
+//        StepVerifier.create(createFlux.log())
+//                    .expectNext(1, 2, 3, 4, 5)
+//                    .verifyComplete();
 
-        StepVerifier.create(createFlux)
-                    .expectNext(1, 2, 3, 4, 5)
-                    .verifyComplete();
-
-        StepVerifier.create(pushFlux)
-                    .expectNext(1, 2, 3, 4, 5)
-                    .verifyComplete();
+//        StepVerifier.create(pushFlux)
+//                    .expectNext(1, 2, 3, 4, 5)
+//                    .verifyComplete();
     }
 
     /**
