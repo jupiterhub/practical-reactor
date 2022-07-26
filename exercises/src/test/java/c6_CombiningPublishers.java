@@ -184,11 +184,8 @@ public class c6_CombiningPublishers extends CombiningPublishersBase {
      */
     @Test
     public void instant_search() {
-        //todo: feel free to change code as you need
-        autoComplete(null);
         Flux<String> suggestions = userSearchInput()
-                //todo: use one operator only
-                ;
+                .flatMap(s -> autoComplete(s));
 
         //don't change below this line
         StepVerifier.create(suggestions)
