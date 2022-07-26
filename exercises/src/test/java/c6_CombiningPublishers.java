@@ -185,7 +185,7 @@ public class c6_CombiningPublishers extends CombiningPublishersBase {
     @Test
     public void instant_search() {
         Flux<String> suggestions = userSearchInput()
-                .flatMap(s -> autoComplete(s));
+                .switchMap(s -> autoComplete(s));
 
         //don't change below this line
         StepVerifier.create(suggestions)
@@ -201,13 +201,10 @@ public class c6_CombiningPublishers extends CombiningPublishersBase {
      */
     @Test
     public void prettify() {
-        //todo: feel free to change code as you need
-        //todo: use when,and,then...
-        Mono<Boolean> successful = null;
-
-        openFile();
-        writeToFile("0x3522285912341");
-        closeFile();
+        Mono<Boolean> successful = openFile()
+                        .then(writeToFile("0x3522285912341"))
+                        .then(closeFile())
+                        .thenReturn(true);
 
         //don't change below this line
         StepVerifier.create(successful)
@@ -224,10 +221,7 @@ public class c6_CombiningPublishers extends CombiningPublishersBase {
      */
     @Test
     public void one_to_n() {
-        //todo: feel free to change code as you need
-        Flux<String> fileLines = null;
-        openFile();
-        readFile();
+        Flux<String> fileLines = openFile().thenMany(readFile());
 
         StepVerifier.create(fileLines)
                     .expectNext("0x1", "0x2", "0x3")
@@ -240,10 +234,7 @@ public class c6_CombiningPublishers extends CombiningPublishersBase {
      */
     @Test
     public void acid_durability() {
-        //todo: feel free to change code as you need
-        Flux<String> committedTasksIds = null;
-        tasksToExecute();
-        commitTask(null);
+        Flux<String> committedTasksIds = tasksToExecute().concatMap(t -> t.flatMap(id -> commitTask(id).thenReturn(id)));
 
         //don't change below this line
         StepVerifier.create(committedTasksIds)
