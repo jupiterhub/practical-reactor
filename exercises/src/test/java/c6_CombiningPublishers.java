@@ -275,8 +275,8 @@ public class c6_CombiningPublishers extends CombiningPublishersBase {
      */
     @Test
     public void car_factory() {
-        //todo: feel free to change code as you need
-        Flux<Car> producedCars = carChassisProducer().flatMap();
+        Flux<Car> producedCars = carChassisProducer().zipWith(carEngineProducer(), (chassis, engine) -> new Car(chassis, engine));
+        // can be shortened with Car::new
 
         //don't change below this line
         StepVerifier.create(producedCars)
@@ -291,15 +291,18 @@ public class c6_CombiningPublishers extends CombiningPublishersBase {
     /**
      * When `chooseSource()` method is used, based on current value of sourceRef, decide which source should be used.
      */
-
     //only read from sourceRef
     AtomicReference<String> sourceRef = new AtomicReference<>("X");
 
     //todo: implement this method based on instructions
     public Mono<String> chooseSource() {
-        sourceA(); //<- choose if sourceRef == "A"
-        sourceB(); //<- choose if sourceRef == "B"
-        return Mono.empty(); //otherwise, return empty
+        if (sourceRef.get().equals("A")) {
+            return sourceA(); //<- choose if sourceRef == "A"
+        } else if (sourceRef.get().equals("B")) {
+            return sourceB(); //<- choose if sourceRef == "B"
+        } else {
+            return Mono.empty(); //otherwise, return empty
+        }
     }
 
     @Test
