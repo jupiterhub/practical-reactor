@@ -296,13 +296,15 @@ public class c6_CombiningPublishers extends CombiningPublishersBase {
 
     //todo: implement this method based on instructions
     public Mono<String> chooseSource() {
-        if (sourceRef.get().equals("A")) {
-            return sourceA(); //<- choose if sourceRef == "A"
-        } else if (sourceRef.get().equals("B")) {
-            return sourceB(); //<- choose if sourceRef == "B"
-        } else {
-            return Mono.empty(); //otherwise, return empty
-        }
+        return Mono.defer(() -> {
+            if (sourceRef.get().equals("A")) {
+                return sourceA(); //<- choose if sourceRef == "A"
+            } else if (sourceRef.get().equals("B")) {
+                return sourceB(); //<- choose if sourceRef == "B"
+            } else {
+                return Mono.empty(); //otherwise, return empty
+            }
+        });
     }
 
     @Test
@@ -335,7 +337,7 @@ public class c6_CombiningPublishers extends CombiningPublishersBase {
         //todo: feel free to change code as you need
         Flux<String> stream = StreamingConnection.startStreaming()
                                                  .flatMapMany(Function.identity());
-        StreamingConnection.closeConnection();
+        stream.doFinally(signalType -> StreamingConnection.closeConnection());
 
         //don't change below this line
         StepVerifier.create(stream)
