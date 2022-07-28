@@ -334,10 +334,9 @@ public class c6_CombiningPublishers extends CombiningPublishersBase {
     public void cleanup() {
         BlockHound.install(); //don't change this line, blocking = cheating!
 
-        //todo: feel free to change code as you need
-        Flux<String> stream = StreamingConnection.startStreaming()
-                                                 .flatMapMany(Function.identity());
-        stream.doFinally(signalType -> StreamingConnection.closeConnection());
+        Flux<String> stream = Flux.usingWhen(StreamingConnection.startStreaming(),
+                stringFlux -> stringFlux,
+                stringFlux -> StreamingConnection.closeConnection());
 
         //don't change below this line
         StepVerifier.create(stream)
