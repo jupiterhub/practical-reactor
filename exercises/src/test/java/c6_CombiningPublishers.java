@@ -251,10 +251,8 @@ public class c6_CombiningPublishers extends CombiningPublishersBase {
      */
     @Test
     public void major_merger() {
-        //todo: feel free to change code as you need
         Flux<String> microsoftBlizzardCorp =
-                microsoftTitles();
-        blizzardTitles();
+                microsoftTitles().mergeWith(blizzardTitles());
 
         //don't change below this line
         StepVerifier.create(microsoftBlizzardCorp)
@@ -278,9 +276,7 @@ public class c6_CombiningPublishers extends CombiningPublishersBase {
     @Test
     public void car_factory() {
         //todo: feel free to change code as you need
-        Flux<Car> producedCars = null;
-        carChassisProducer();
-        carEngineProducer();
+        Flux<Car> producedCars = carChassisProducer().flatMap();
 
         //don't change below this line
         StepVerifier.create(producedCars)
