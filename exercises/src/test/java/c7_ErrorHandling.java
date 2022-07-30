@@ -176,8 +176,7 @@ public class c7_ErrorHandling extends ErrorHandlingBase {
     @Test
     public void its_hot_in_here() {
         Mono<Integer> temperature = temperatureSensor()
-                //todo: change this line only
-                ;
+                .retry();
 
         StepVerifier.create(temperature)
                     .expectNext(34)
