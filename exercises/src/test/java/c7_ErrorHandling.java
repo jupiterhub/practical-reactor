@@ -159,9 +159,10 @@ public class c7_ErrorHandling extends ErrorHandlingBase {
      */
     @Test
     public void resilience() {
-        //todo: change code as you need
         Flux<String> content = getFilesContent()
-                .flatMap(Function.identity()); //start from here
+                .flatMap(Function.identity())
+                .onErrorResume(throwable -> Mono.empty());
+
 
         //don't change below this line
         StepVerifier.create(content)
