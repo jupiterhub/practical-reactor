@@ -36,8 +36,7 @@ public class c7_ErrorHandling extends ErrorHandlingBase {
         AtomicReference<Throwable> errorRef = new AtomicReference<>();
         Flux<String> heartBeat = probeHeartBeatSignal()
                 .timeout(Duration.ofSeconds(3))
-                .doOnError(throwable -> errorRef.set(throwable))
-                ;
+                .doOnError(errorRef::set);
 
         StepVerifier.create(heartBeat)
                     .expectNextCount(3)
@@ -55,8 +54,7 @@ public class c7_ErrorHandling extends ErrorHandlingBase {
     @Test
     public void potato_potato() {
         Mono<String> currentUser = getCurrentUser()
-                //todo: change this line only
-                //use SecurityException
+                .onErrorMap(e -> new SecurityException(e))
                 ;
 
         StepVerifier.create(currentUser)
