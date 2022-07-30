@@ -98,9 +98,8 @@ public class c7_ErrorHandling extends ErrorHandlingBase {
      */
     @Test
     public void error_reporter() {
-        //todo: feel free to change code as you need
-        Flux<String> messages = messageNode();
-        errorReportService(null);
+        Flux<String> messages = messageNode()
+                .doOnError(throwable -> errorReportService(throwable));
 
         //don't change below this line
         StepVerifier.create(messages)
