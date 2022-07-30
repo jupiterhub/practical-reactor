@@ -99,7 +99,7 @@ public class c7_ErrorHandling extends ErrorHandlingBase {
     @Test
     public void error_reporter() {
         Flux<String> messages = messageNode()
-                .doOnError(throwable -> errorReportService(throwable));
+                .onErrorResume(throwable -> errorReportService(throwable).then(Mono.error(throwable)));
 
         //don't change below this line
         StepVerifier.create(messages)
