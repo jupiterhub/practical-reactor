@@ -120,8 +120,7 @@ public class c7_ErrorHandling extends ErrorHandlingBase {
                 .flatMap(task -> task.execute()
                         .then(task.commit())
                         .onErrorResume(task::rollback)
-                        .thenReturn(task))
-                ;
+                        .thenReturn(task));
 
         StepVerifier.create(taskFlux)
                     .expectNextMatches(task -> task.executedExceptionally.get())
