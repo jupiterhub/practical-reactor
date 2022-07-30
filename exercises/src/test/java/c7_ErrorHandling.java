@@ -137,7 +137,7 @@ public class c7_ErrorHandling extends ErrorHandlingBase {
     public void billion_dollar_mistake() {
         Flux<String> content = getFilesContent()
                 .flatMap(Function.identity())
-                //todo: change this line only
+                .onErrorContinue((throwable, o) -> System.out.println("SKIPPING ERROR: " + throwable));
                 ;
 
         StepVerifier.create(content)
