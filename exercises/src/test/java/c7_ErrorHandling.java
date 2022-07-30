@@ -160,8 +160,7 @@ public class c7_ErrorHandling extends ErrorHandlingBase {
     @Test
     public void resilience() {
         Flux<String> content = getFilesContent()
-                .flatMap(Function.identity())
-                .onErrorResume(throwable -> Mono.empty());
+                .flatMap(stringMono -> stringMono.doOnError(System.out::println).onErrorResume(throwable -> Mono.empty()));
 
 
         //don't change below this line
