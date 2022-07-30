@@ -34,8 +34,7 @@ public class c7_ErrorHandling extends ErrorHandlingBase {
     public void houston_we_have_a_problem() {
         AtomicReference<Throwable> errorRef = new AtomicReference<>();
         Flux<String> heartBeat = probeHeartBeatSignal()
-                //todo: do your changes here
-                //todo: & here
+                .doOnError(throwable -> errorRef.set(throwable))
                 ;
 
         StepVerifier.create(heartBeat)
