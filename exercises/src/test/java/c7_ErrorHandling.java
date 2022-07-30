@@ -118,7 +118,9 @@ public class c7_ErrorHandling extends ErrorHandlingBase {
     public void unit_of_work() {
         Flux<Task> taskFlux = taskQueue()
                 .flatMap(task -> task.execute()
-                        .onErrorReturn(throwable -> task.rollback(throwable)))
+                        .then(task.commit())
+                        .onErrorResume(task::rollback)
+                        .thenReturn(task))
                 ;
 
         StepVerifier.create(taskFlux)
