@@ -2,6 +2,7 @@ import org.junit.jupiter.api.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import reactor.util.retry.Retry;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
@@ -191,7 +192,7 @@ public class c7_ErrorHandling extends ErrorHandlingBase {
     @Test
     public void back_off() {
         Mono<String> connection_result = establishConnection()
-                //todo: change this line only
+                .retryWhen(Retry.backoff(3, Duration.ofSeconds(3)))
                 ;
 
         StepVerifier.create(connection_result)
