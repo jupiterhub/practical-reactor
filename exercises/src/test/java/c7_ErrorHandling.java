@@ -69,8 +69,8 @@ public class c7_ErrorHandling extends ErrorHandlingBase {
      */
     @Test
     public void under_the_rug() {
-        Flux<String> messages = messageNode();
-        //todo: change this line only
+        Flux<String> messages = messageNode()
+                .onErrorResume(throwable -> Flux.empty());
         ;
 
         StepVerifier.create(messages)
