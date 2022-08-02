@@ -131,11 +131,10 @@ public class c9_ExecutionControl extends ExecutionControlBase {
      */
     @Test
     public void free_runners() {
-        //todo: feel free to change code as you need
-        Mono<Void> task = Mono.fromRunnable(ExecutionControlBase::blockingCall);
+        Mono<Void> task = Mono.fromRunnable(ExecutionControlBase::blockingCall).subscribeOn(Schedulers.parallel()).then();
 
         Flux<Void> taskQueue = Flux.just(task, task, task)
-                                   .concatMap(Function.identity());
+                                   .flatMap(Function.identity(), 3);
 
         //don't change code below
         Duration duration = StepVerifier.create(taskQueue)
