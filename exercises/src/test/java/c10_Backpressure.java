@@ -70,7 +70,8 @@ public class c10_Backpressure extends BackpressureBase {
     public void limited_demand() {
         CopyOnWriteArrayList<Long> requests = new CopyOnWriteArrayList<>();
         Flux<String> messageStream = messageStream2()
-                //todo: do your changes here
+                .doOnRequest(requests::add)
+                .limitRate(1)
                 ;
 
         StepVerifier.create(messageStream, StepVerifierOptions.create().initialRequest(0))
