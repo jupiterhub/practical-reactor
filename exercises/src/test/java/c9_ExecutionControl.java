@@ -149,9 +149,8 @@ public class c9_ExecutionControl extends ExecutionControlBase {
      */
     @Test
     public void sequential_free_runners() {
-        //todo: feel free to change code as you need
         Flux<String> tasks = tasks()
-                .flatMap(Function.identity());
+                .flatMapSequential(Function.identity());
         ;
 
         //don't change code below
