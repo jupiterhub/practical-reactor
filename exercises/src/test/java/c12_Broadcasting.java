@@ -79,7 +79,7 @@ public class c12_Broadcasting extends BroadcastingBase {
     @Test
     public void history_lesson() {
         Flux<String> updates = systemUpdates()
-                //todo: do your changes here
+                .replay().autoConnect()
                 ;
 
         //subscriber 1
