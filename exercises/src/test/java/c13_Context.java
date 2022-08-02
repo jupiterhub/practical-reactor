@@ -55,7 +55,7 @@ public class c13_Context extends ContextBase {
         Mono<Void> repeat = Mono.deferContextual(ctx -> {
             ctx.get(AtomicInteger.class).incrementAndGet();
             return openConnection();
-        }).contextWrite(ctx -> ctx.put(AtomicInteger.class, counter));
+        }).contextWrite(Context.of(AtomicInteger.class, counter));  // lambda is also possible
 
         StepVerifier.create(repeat.repeat(4))
                     .thenAwait(Duration.ofSeconds(10))
@@ -74,13 +74,23 @@ public class c13_Context extends ContextBase {
      */
     @Test
     public void pagination() {
-        AtomicInteger pageWithError = new AtomicInteger(); //todo: set this field when error occurs
+        AtomicInteger pageWithError = new AtomicInteger();
 
-        //todo: start from here
-        Flux<Integer> results = getPage(0)
-                .flatMapMany(Page::getResult)
-                .repeat(10)
-                .doOnNext(i -> System.out.println("Received: " + i));
+        Flux<Integer> results = Mono.deferContextual(contextView -> getPage(contextView.get(AtomicInteger.class).get()))
+                    .doOnEach(s -> {
+                        if (s.isOnNext()) {
+                            int nextPage = s.getContextView().get(AtomicInteger.class).incrementAndGet();
+                            System.out.println("Next page: " + nextPage);
+                        } else if (s.isOnError()) {
+                            System.out.println("Page with error: " + s.getContextView().get(AtomicInteger.class).get());
+                            pageWithError.set(s.getContextView().get(AtomicInteger.class).getAndIncrement());
+                        }
+                    })
+                    .onErrorResume(e -> Mono.empty())
+                    .flatMapMany(Page::getResult)
+                    .repeat(10)
+                    .doOnNext(i -> System.out.println("Received: " + i))
+                    .contextWrite(context -> context.put(AtomicInteger.class, new AtomicInteger(0)));
 
 
         //don't change this code
