@@ -102,7 +102,7 @@ public class c8_Sinks extends SinksBase {
      */
     @Test
     public void open_24_7() {
-        Sinks.Many<Integer> sink = Sinks.many().multicast().onBackpressureBuffer(5, false);
+        Sinks.Many<Integer> sink = Sinks.many().multicast().onBackpressureBuffer(2, false);
         Flux<Integer> flux = sink.asFlux();
 
         //don't change code below
@@ -143,8 +143,7 @@ public class c8_Sinks extends SinksBase {
      */
     @Test
     public void blue_jeans() {
-        //todo: enable autoCancel parameter to prevent sink from closing
-        Sinks.Many<Integer> sink = Sinks.many().multicast().onBackpressureBuffer();
+        Sinks.Many<Integer> sink = Sinks.many().replay().all();
         Flux<Integer> flux = sink.asFlux();
 
         //don't change code below
@@ -186,12 +185,11 @@ public class c8_Sinks extends SinksBase {
      */
     @Test
     public void emit_failure() {
-        //todo: feel free to change code as you need
-        Sinks.Many<Integer> sink = Sinks.many().replay().all();
+        Sinks.Many<Integer> sink = Sinks.many().unicast().onBackpressureBuffer();
 
         for (int i = 1; i <= 50; i++) {
-            int finalI = i;
-            new Thread(() -> sink.tryEmitNext(finalI)).start();
+            final int finalI = i;
+            new Thread(() -> sink.emitNext(finalI, (signalType, emitResult) -> emitResult.isFailure())).start();
         }
 
         //don't change code below
