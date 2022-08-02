@@ -33,11 +33,11 @@ public class c8_Sinks extends SinksBase {
      */
     @Test
     public void single_shooter() {
-        //todo: feel free to change code as you need
-        Mono<Boolean> operationCompleted = null;
+        var sink = Sinks.<Boolean>one();
+        Mono<Boolean> operationCompleted = sink.asMono();
         submitOperation(() -> {
-
             doSomeWork(); //don't change this line
+            sink.tryEmitValue(true);
         });
 
         //don't change code below
