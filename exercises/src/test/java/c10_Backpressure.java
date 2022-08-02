@@ -71,8 +71,7 @@ public class c10_Backpressure extends BackpressureBase {
         CopyOnWriteArrayList<Long> requests = new CopyOnWriteArrayList<>();
         Flux<String> messageStream = messageStream2()
                 .doOnRequest(requests::add)
-                .limitRate(1)
-                ;
+                .limitRate(1);
 
         StepVerifier.create(messageStream, StepVerifierOptions.create().initialRequest(0))
                     .expectSubscription()
@@ -94,7 +93,11 @@ public class c10_Backpressure extends BackpressureBase {
     @Test
     public void uuid_generator() {
         Flux<UUID> uuidGenerator = Flux.create(sink -> {
-            //todo: do your changes here
+            sink.onRequest(value -> {
+                for (int i = 0; i < value; i++) {
+                    sink.next(UUID.randomUUID());
+                }
+            });
         });
 
         StepVerifier.create(uuidGenerator
