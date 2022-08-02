@@ -75,10 +75,8 @@ public class c9_ExecutionControl extends ExecutionControlBase {
      */
     @Test
     public void ready_set_go() {
-        //todo: feel free to change code as you need
         Flux<String> tasks = tasks()
-                .flatMap(Function.identity());
-        semaphore();
+                .concatMap(task -> task.delaySubscription(semaphore()));
 
         //don't change code below
         StepVerifier.create(tasks)
@@ -104,7 +102,7 @@ public class c9_ExecutionControl extends ExecutionControlBase {
                                   assert NonBlocking.class.isAssignableFrom(Thread.currentThread().getClass());
                                   System.out.println("Task executing on: " + currentThread.getName());
                               })
-                              //todo: change this line only
+              .subscribeOn(Schedulers.parallel())
                               .then();
 
         StepVerifier.create(task)
