@@ -71,7 +71,9 @@ public class c11_Batching extends BatchingBase {
     @Test
     public void sum_over_time() {
         Flux<Long> metrics = metrics()
-                //todo: implement your changes here
+                .window(Duration.ofSeconds(1))
+                .concatMap(m -> m.reduce(0L, Long::sum))
+                .doOnNext(d -> System.out.println("Accumulated sum: " + d))
                 .take(10);
 
         StepVerifier.create(metrics)
