@@ -140,7 +140,7 @@ public class c10_Backpressure extends BackpressureBase {
     @Test
     public void u_wont_brake_me() {
         Flux<String> messageStream = messageStream4()
-                //todo: change this line only
+                .onBackpressureBuffer()
                 ;
 
         StepVerifier.create(messageStream, StepVerifierOptions.create()
