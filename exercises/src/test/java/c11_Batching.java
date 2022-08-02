@@ -51,9 +51,10 @@ public class c11_Batching extends BatchingBase {
     @Test
     public void command_gateway() {
         //todo: implement your changes here
-        Flux<Void> processCommands = null;
-        inputCommandStream();
-        sendCommand(null);
+        Flux<Void> processCommands = inputCommandStream()
+                .groupBy(command -> command.getAggregateId())
+                .flatMap(groupedCommand -> groupedCommand.flatMap(this::sendCommand))
+        ;
 
         //do not change the code below
         Duration duration = StepVerifier.create(processCommands)
