@@ -51,12 +51,11 @@ public class c13_Context extends ContextBase {
      */
     @Test
     public void execution_counter() {
+        AtomicInteger counter = new AtomicInteger();
         Mono<Void> repeat = Mono.deferContextual(ctx -> {
             ctx.get(AtomicInteger.class).incrementAndGet();
             return openConnection();
-        });
-        //todo: change this line only
-        ;
+        }).contextWrite(ctx -> ctx.put(AtomicInteger.class, counter));
 
         StepVerifier.create(repeat.repeat(4))
                     .thenAwait(Duration.ofSeconds(10))
